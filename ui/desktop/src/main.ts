@@ -628,6 +628,26 @@ app.whenReady().then(async () => {
       });
     })
   })
+
+  ipcMain.handle('write-local-goosehints-file', (event, directory, content) => {
+    const filePath = path.join(directory, '.goosehints');
+    return new Promise((resolve) => {
+      const command = `cat << 'EOT' > ${filePath}
+${content}
+EOT`;
+      exec(command, (error, stdout, stderr) => {
+        if (error) {
+          console.error('Error writing to file:', error);
+          resolve(false);
+        }
+        if (stderr) {
+          console.error('Error output:', stderr);
+          resolve(false);
+        }
+        resolve(true);
+      });
+    });
+  });
 });
 
 // Quit when all windows are closed, except on macOS.

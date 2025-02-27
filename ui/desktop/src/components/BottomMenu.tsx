@@ -77,7 +77,9 @@ export default function BottomMenu({
         <ChevronUp className="ml-1" />
       </span>
 
-      <ConfigureGooseHints directory={window.appConfig.get('GOOSE_WORKING_DIR')} />
+      <div className="ml-4">
+        <ConfigureGooseHints directory={window.appConfig.get('GOOSE_WORKING_DIR')} />
+      </div>
 
       {/* Model Selector Dropdown - Only in development */}
       <div className="relative flex items-center ml-auto mr-4" ref={dropdownRef}>

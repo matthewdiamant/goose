@@ -65,7 +65,7 @@ const ModalButtons = ({ onSubmit, onCancel }) => (
     <Button
       type="submit"
       variant="ghost"
-      onClick={() => onSubmit(false)}
+      onClick={onSubmit}
       className="w-full h-[60px] rounded-none border-t border-borderSubtle text-base hover:bg-bgSubtle text-textProminent font-regular"
     >
       Submit
@@ -73,7 +73,7 @@ const ModalButtons = ({ onSubmit, onCancel }) => (
     <Button
       type="button"
       variant="ghost"
-      onClick={() => onCancel(false)}
+      onClick={onCancel}
       className="w-full h-[60px] rounded-none border-t border-borderSubtle hover:text-textStandard text-textSubtle hover:bg-bgSubtle text-base font-regular"
     >
       Cancel
@@ -81,15 +81,11 @@ const ModalButtons = ({ onSubmit, onCancel }) => (
   </div>
 );
 
-const getGoosehintsFile = async (directory) =>
-  await window.electron.readLocalGoosehintsFile(directory);
-
-export const ConfigureGooseHints = ({ directory }) => {
-  const [isGooseHintsModalOpen, setIsGoosehintsModalOpen] = useState<boolean>(false);
+const GoosehintsModal = ({ directory, setIsGoosehintsModalOpen }) => {
   const [goosehintsFile, setGoosehintsFile] = useState<string>(null);
   const [goosehintsFileFound, setGoosehintsFileFound] = useState<boolean>(false);
   const [goosehintsFilePath, setGoosehintsFilePath] = useState<string>(null);
-  const [goosehintsFileError, setGoosehintsFileError] = useState<string>(null);
+  const [goosehintsFileReadError, setGoosehintsFileReadError] = useState<string>(null);
 
   useEffect(() => {
     const fetchGoosehintsFile = async () => {
@@ -98,7 +94,7 @@ export const ConfigureGooseHints = ({ directory }) => {
         setGoosehintsFile(file);
         setGoosehintsFilePath(filePath);
         setGoosehintsFileFound(found);
-        setGoosehintsFileError(error);
+        setGoosehintsFileReadError(error);
       } catch (error) {
         console.error('Error fetching .goosehints file:', error);
       }
@@ -106,41 +102,56 @@ export const ConfigureGooseHints = ({ directory }) => {
     if (directory) fetchGoosehintsFile();
   }, [directory]);
 
+  const writeFile = async () => {
+    await window.electron.writeLocalGoosehintsFile(directory, goosehintsFile);
+    setIsGoosehintsModalOpen(false);
+  };
+
+  return (
+    <Modal>
+      <ModalHeader />
+      <ModalHelpText />
+      <div className="flex-1">
+        {goosehintsFileReadError ? (
+          <ModalError error={goosehintsFileReadError} />
+        ) : (
+          <div className="flex flex-col space-y-2 h-full">
+            <ModalFileInfo filePath={goosehintsFilePath} found={goosehintsFileFound} />
+            <textarea
+              defaultValue={goosehintsFile}
+              autoFocus
+              className="w-full flex-1 border rounded-md min-h-40 p-2 text-sm resize-none"
+              onChange={(event) => {
+                setGoosehintsFile(event.target.value);
+              }}
+            />
+          </div>
+        )}
+      </div>
+      <ModalButtons onSubmit={writeFile} onCancel={() => setIsGoosehintsModalOpen(false)} />
+    </Modal>
+  );
+};
+
+const getGoosehintsFile = async (directory) =>
+  await window.electron.readLocalGoosehintsFile(directory);
+
+export const ConfigureGooseHints = ({ directory }) => {
+  const [isGooseHintsModalOpen, setIsGoosehintsModalOpen] = useState<boolean>(false);
   return (
     <span>
-      <div className="cursor-pointer ml-4" onClick={() => setIsGoosehintsModalOpen(true)}>
+      <div
+        className="cursor-pointer ml-4 hover:opacity-75"
+        onClick={() => setIsGoosehintsModalOpen(true)}
+      >
         Configure .goosehints
       </div>
 
       {isGooseHintsModalOpen ? (
-        <Modal>
-          <ModalHeader />
-          <ModalHelpText />
-          <div className="flex-1">
-            {goosehintsFileError ? (
-              <ModalError error={goosehintsFileError} />
-            ) : (
-              <div className="flex flex-col space-y-2 h-full">
-                <ModalFileInfo filePath={goosehintsFilePath} found={goosehintsFileFound} />
-                <textarea
-                  defaultValue={goosehintsFile}
-                  autoFocus
-                  className="w-full flex-1 border rounded-md min-h-40 p-2 text-sm resize-none"
-                  onChange={(event) => {
-                    setGoosehintsFile(event.target.value);
-                  }}
-                />
-              </div>
-            )}
-          </div>
-          <ModalButtons
-            onSubmit={() => {
-              // Handle submit logic here
-              setIsGoosehintsModalOpen(false);
-            }}
-            onCancel={() => setIsGoosehintsModalOpen(false)}
-          />
-        </Modal>
+        <GoosehintsModal
+          directory={directory}
+          setIsGoosehintsModalOpen={setIsGoosehintsModalOpen}
+        />
       ) : null}
     </span>
   );

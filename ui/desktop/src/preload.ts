@@ -19,6 +19,7 @@ type ElectronAPI = {
   stopPowerSaveBlocker: () => Promise<void>;
   getBinaryPath: (binaryName: string) => Promise<string>;
   readLocalGoosehintsFile: (directory: string) => Promise<{ file: string; filePath: string; error: string; found: boolean }>;
+  writeLocalGoosehintsFile: (directory: string, content: string) => Promise<boolean>;
   on: (
     channel: string,
     callback: (event: Electron.IpcRendererEvent, ...args: any[]) => void
@@ -52,6 +53,8 @@ const electronAPI: ElectronAPI = {
   stopPowerSaveBlocker: () => ipcRenderer.invoke('stop-power-save-blocker'),
   getBinaryPath: (binaryName: string) => ipcRenderer.invoke('get-binary-path', binaryName),
   readLocalGoosehintsFile: (directory: string) => ipcRenderer.invoke('read-local-goosehints-file', directory),
+  writeLocalGoosehintsFile: (directory: string, content: string) =>
+    ipcRenderer.invoke('write-local-goosehints-file', directory, content),
   on: (channel: string, callback: (event: Electron.IpcRendererEvent, ...args: any[]) => void) => {
     ipcRenderer.on(channel, callback);
   },
