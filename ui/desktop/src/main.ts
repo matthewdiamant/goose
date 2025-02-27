@@ -612,25 +612,23 @@ app.whenReady().then(async () => {
     }
   });
 
-  ipcMain.handle('read-local-goosehints-file', (event, directory) => {
-    const filePath = path.join(directory, '.goosehints');
+  ipcMain.handle('read-file', (event, filePath) => {
     return new Promise((resolve) => {
       exec(`cat ${filePath}`, (error, stdout, stderr) => {
         if (error) {
-          // File not found, allow creation of a new one
+          // File not found
           resolve({ file: "", filePath, error: null, found: false });
         }
         if (stderr) {
           console.error('Error output:', stderr);
-          resolve({ file: "", filePath, error: null, found: false });
+          resolve({ file: "", filePath, error, found: false });
         }
         resolve({ file: stdout, filePath, error: null, found: true });
       });
     })
   })
 
-  ipcMain.handle('write-local-goosehints-file', (event, directory, content) => {
-    const filePath = path.join(directory, '.goosehints');
+  ipcMain.handle('write-file', (event, filePath, content) => {
     return new Promise((resolve) => {
       const command = `cat << 'EOT' > ${filePath}
 ${content}

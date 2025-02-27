@@ -68,7 +68,7 @@ const ModalButtons = ({ onSubmit, onCancel }) => (
       onClick={onSubmit}
       className="w-full h-[60px] rounded-none border-t border-borderSubtle text-base hover:bg-bgSubtle text-textProminent font-regular"
     >
-      Submit
+      Save
     </Button>
     <Button
       type="button"
@@ -81,18 +81,23 @@ const ModalButtons = ({ onSubmit, onCancel }) => (
   </div>
 );
 
-const GoosehintsModal = ({ directory, setIsGoosehintsModalOpen }) => {
+const getGoosehintsFile = async (filePath) => await window.electron.readFile(filePath);
+
+type GoosehintsModalProps = {
+  directory: string;
+  setIsGoosehintsModalOpen: (isOpen: boolean) => void;
+};
+const GoosehintsModal = ({ directory, setIsGoosehintsModalOpen }: GoosehintsModalProps) => {
+  const goosehintsFilePath = `${directory}/.goosehints`;
   const [goosehintsFile, setGoosehintsFile] = useState<string>(null);
   const [goosehintsFileFound, setGoosehintsFileFound] = useState<boolean>(false);
-  const [goosehintsFilePath, setGoosehintsFilePath] = useState<string>(null);
   const [goosehintsFileReadError, setGoosehintsFileReadError] = useState<string>(null);
 
   useEffect(() => {
     const fetchGoosehintsFile = async () => {
       try {
-        const { file, filePath, error, found } = await getGoosehintsFile(directory);
+        const { file, error, found } = await getGoosehintsFile(goosehintsFilePath);
         setGoosehintsFile(file);
-        setGoosehintsFilePath(filePath);
         setGoosehintsFileFound(found);
         setGoosehintsFileReadError(error);
       } catch (error) {
@@ -100,10 +105,10 @@ const GoosehintsModal = ({ directory, setIsGoosehintsModalOpen }) => {
       }
     };
     if (directory) fetchGoosehintsFile();
-  }, [directory]);
+  }, [directory, goosehintsFilePath]);
 
   const writeFile = async () => {
-    await window.electron.writeLocalGoosehintsFile(directory, goosehintsFile);
+    await window.electron.writeFile(goosehintsFilePath, goosehintsFile);
     setIsGoosehintsModalOpen(false);
   };
 
@@ -121,9 +126,7 @@ const GoosehintsModal = ({ directory, setIsGoosehintsModalOpen }) => {
               defaultValue={goosehintsFile}
               autoFocus
               className="w-full flex-1 border rounded-md min-h-40 p-2 text-sm resize-none"
-              onChange={(event) => {
-                setGoosehintsFile(event.target.value);
-              }}
+              onChange={(event) => setGoosehintsFile(event.target.value)}
             />
           </div>
         )}
@@ -133,10 +136,7 @@ const GoosehintsModal = ({ directory, setIsGoosehintsModalOpen }) => {
   );
 };
 
-const getGoosehintsFile = async (directory) =>
-  await window.electron.readLocalGoosehintsFile(directory);
-
-export const ConfigureGooseHints = ({ directory }) => {
+export const ConfigureGooseHints = ({ directory }: { directory: string }) => {
   const [isGooseHintsModalOpen, setIsGoosehintsModalOpen] = useState<boolean>(false);
   return (
     <span>
