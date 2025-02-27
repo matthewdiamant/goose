@@ -611,6 +611,23 @@ app.whenReady().then(async () => {
       spawn('xdg-open', [url]);
     }
   });
+
+  ipcMain.handle('read-local-goosehints-file', (event, directory) => {
+    const filePath = path.join(directory, '.goosehints');
+    return new Promise((resolve) => {
+      exec(`cat ${filePath}`, (error, stdout, stderr) => {
+        if (error) {
+          // File not found, allow creation of a new one
+          resolve({ file: "", filePath, error: null, found: false });
+        }
+        if (stderr) {
+          console.error('Error output:', stderr);
+          resolve({ file: "", filePath, error: null, found: false });
+        }
+        resolve({ file: stdout, filePath, error: null, found: true });
+      });
+    })
+  })
 });
 
 // Quit when all windows are closed, except on macOS.
