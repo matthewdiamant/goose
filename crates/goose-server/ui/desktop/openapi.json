@@ -208,6 +208,27 @@
           }
         }
       }
+    },
+    "/config/get_path": {
+      "get": {
+        "tags": [
+          "super::routes::config_management"
+        ],
+        "summary": "Get the path to the configuration file",
+        "operationId": "get_config_path",
+        "responses": {
+          "200": {
+            "description": "Configuration path retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigPathResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -271,6 +292,18 @@
           },
           "value": {
             "description": "The value to set for the configuration"
+          }
+        }
+      },
+      "ConfigPathResponse": {
+        "type": "object",
+        "required": [
+          "path"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "The path to the configuration file"
           }
         }
       }

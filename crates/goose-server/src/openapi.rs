@@ -4,6 +4,7 @@ use utoipa::OpenApi;
 #[derive(OpenApi)]
 #[openapi(
     paths(
+        super::routes::config_management::get_config_path,
         super::routes::config_management::upsert_config,
         super::routes::config_management::remove_config,
         super::routes::config_management::read_config,
@@ -12,6 +13,7 @@ use utoipa::OpenApi;
         super::routes::config_management::read_all_config
     ),
     components(schemas(
+        super::routes::config_management::ConfigPathResponse,
         super::routes::config_management::UpsertConfigQuery,
         super::routes::config_management::ConfigKeyQuery,
         super::routes::config_management::ExtensionQuery,

@@ -4,6 +4,10 @@ export type ConfigKeyQuery = {
     key: string;
 };
 
+export type ConfigPathResponse = {
+    path: string;
+};
+
 export type ConfigResponse = {
     config: {};
 };
@@ -88,6 +92,22 @@ export type AddExtensionResponses = {
 };
 
 export type AddExtensionResponse = AddExtensionResponses[keyof AddExtensionResponses];
+
+export type GetConfigPathData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/config/path';
+};
+
+export type GetConfigPathResponses = {
+    /**
+     * Configuration path retrieved successfully
+     */
+    200: ConfigPathResponse;
+};
+
+export type GetConfigPathResponse = GetConfigPathResponses[keyof GetConfigPathResponses];
 
 export type ReadConfigData = {
     body: ConfigKeyQuery;

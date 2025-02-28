@@ -36,6 +36,11 @@ pub struct ConfigResponse {
     pub config: HashMap<String, Value>,
 }
 
+#[derive(Serialize, ToSchema)]
+pub struct ConfigPathResponse {
+    pub path: String,
+}
+
 #[utoipa::path(
     post,
     path = "/config/upsert",
@@ -194,9 +199,25 @@ pub async fn read_all_config(
     Ok(Json(ConfigResponse { config: values }))
 }
 
+#[utoipa::path(
+    get,
+    path = "/config/path",
+    responses(
+        (status = 200, description = "Configuration path retrieved successfully", body = ConfigPathResponse)
+    )
+)]
+pub async fn get_config_path(
+    State(_state): State<Arc<Mutex<HashMap<String, Value>>>>,
+) -> Result<Json<ConfigPathResponse>, StatusCode> {
+    let config = Config::global();
+    let path = config.path();
+    Ok(Json(ConfigPathResponse { path: path }))
+}
+
 pub fn routes(state: AppState) -> Router {
     Router::new()
         .route("/config", get(read_all_config))
+        .route("/config/path", get(get_config_path))
         .route("/config/upsert", post(upsert_config))
         .route("/config/remove", post(remove_config))
         .route("/config/read", post(read_config))

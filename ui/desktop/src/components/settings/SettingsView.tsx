@@ -15,6 +15,8 @@ import BackButton from '../ui/BackButton';
 import { RecentModelsRadio } from './models/RecentModels';
 import { ExtensionItem } from './extensions/ExtensionItem';
 import type { View } from '../../App';
+import { shell } from 'electron';
+import { useConfig } from '../ConfigContext';
 
 const EXTENSIONS_DESCRIPTION =
   'The Model Context Protocol (MCP) is a system that allows AI models to securely connect with local or remote resources using standard server setups. It works like a client-server setup and expands AI capabilities using three main components: Prompts, Resources, and Tools.';
@@ -60,6 +62,16 @@ export default function SettingsView({
   setView: (view: View) => void;
   viewOptions: SettingsViewOptions;
 }) {
+  const { config } = useConfig();
+
+  React.useEffect(() => {
+    const getPath = async () => {
+      const path = await config.getPath();
+      console.log(path);
+    };
+    getPath();
+  }, []);
+
   const [settings, setSettings] = React.useState<SettingsType>(() => {
     const saved = localStorage.getItem('user_settings');
     window.electron.logInfo('Settings: ' + saved);
@@ -253,6 +265,22 @@ export default function SettingsView({
                       </button>
                     </div>
                   )}
+                </div>
+              </section>
+
+              <section>
+                <div className="flex justify-between items-center mb-6 border-b border-borderSubtle px-8">
+                  <h2 className="text-xl font-semibold text-textStandard">Config YAML</h2>
+                </div>
+                <div className="px-8">
+                  <button
+                    className="text-indigo-500 hover:text-indigo-600 text-sm"
+                    onClick={() => {
+                      shell.openExternal('file://' + window.electron());
+                    }}
+                  >
+                    Edit config.yaml file...
+                  </button>
                 </div>
               </section>
             </div>

@@ -10,7 +10,7 @@
     "license": {
       "name": "Apache-2.0"
     },
-    "version": "1.0.9"
+    "version": "1.0.10"
   },
   "paths": {
     "/config": {
@@ -99,6 +99,26 @@
           },
           "500": {
             "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/config/path": {
+      "get": {
+        "tags": [
+          "super::routes::config_management"
+        ],
+        "operationId": "get_config_path",
+        "responses": {
+          "200": {
+            "description": "Configuration path retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfigPathResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -213,6 +233,17 @@
         ],
         "properties": {
           "key": {
+            "type": "string"
+          }
+        }
+      },
+      "ConfigPathResponse": {
+        "type": "object",
+        "required": [
+          "path"
+        ],
+        "properties": {
+          "path": {
             "type": "string"
           }
         }

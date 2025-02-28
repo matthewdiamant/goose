@@ -1,4 +1,5 @@
 import {
+  getConfigPath,
   readAllConfig,
   readConfig,
   removeConfig,
@@ -18,6 +19,10 @@ client.setConfig({
 });
 
 export class Config {
+  static async getPath() {
+    return await getConfigPath()
+  }
+
   static async upsert(key: string, value: any, isSecret?: boolean) {
     return await upsertConfig({
       body: {

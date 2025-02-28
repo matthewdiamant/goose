@@ -3,6 +3,7 @@ import { Config } from '../api/config';
 
 interface ConfigContextType {
   config: Record<string, any>;
+  getPath: () => Promise<any>;
   upsert: (key: string, value: any, isSecret?: boolean) => Promise<void>;
   read: (key: string) => Promise<any>;
   remove: (key: string) => Promise<void>;
@@ -32,6 +33,10 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
     setConfig(newConfig || {});
   };
 
+  const getPath = async () => {
+    return Config.getPath();
+  };
+
   const upsert = async (key: string, value: any, isSecret?: boolean) => {
     await Config.upsert(key, value, isSecret);
     await reloadConfig();
@@ -57,7 +62,9 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children }) => {
   };
 
   return (
-    <ConfigContext.Provider value={{ config, upsert, read, remove, addExtension, removeExtension }}>
+    <ConfigContext.Provider
+      value={{ config, getPath, upsert, read, remove, addExtension, removeExtension }}
+    >
       {children}
     </ConfigContext.Provider>
   );
